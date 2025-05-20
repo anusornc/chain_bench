@@ -123,7 +123,3 @@ This suite creates different graph structures (Blockchain, DAG, BlockDAG) and be
 * `config/`: Application configuration.
 * `benchmark_results/`: Default output directory for consensus benchmarks.
 * `benchmark_graph_results_enhanced/`: Default output directory for graph benchmarks.
-
-## Contributing
-
-(Add guidelines for contributing if this is an open project).
