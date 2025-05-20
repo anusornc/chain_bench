@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Benchee Report</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/benchee.css">
+    <link rel="stylesheet" type="text/css" href="assets/fontello/css/fontello.css">
+  
+</head>
+
+  <body>
+
+    <div class="header">
+  <h1>benchee report</h1>
+  
+
+  <span class="version-note">
+  <a href="javascript:toggleSystemDataInfo();" title="Click to toggle system info">System info</a>
+</span>
+
+</div>
+
+
+    <article id="system-info" class="benchee-systeminfo" >
+  <h3>System info</h3>
+  <ul class="benchee-systeminfo-list">
+    <li>Elixir: 1.18.3</li>
+    <li>Erlang: 27.3.4</li>
+    <li>Operating system: macOS</li>
+    <li>Available memory: 8 GB</li>
+    <li>CPU Information: Apple M1</li>
+    <li>Number of Available Cores: 8</li>
+  </ul>
+</article>
+
+
+    
+      <article>
+        <h2>
+          <a name="run_time" href="#run_time">POA / 1 nodes / 100 tx Run Time</a>
+          <a href="https://github.com/PragTob/benchee_html/wiki/Chart-Types#individual">
+            <i
+              class="benchee-help-icon icon-question-circle-o"
+              title="Graphs showing the individual run time distribution for POA / 1 nodes / 100 tx.
+  Run Times Histogram shows the distribution of occurrences of specific run times in buckets.
+  Raw Run Times shows all individual recorded run times in the order they were recorded in."
+            ></i>
+          </a>
+        </h2>
+
+        <section>
+          <table>
+  <thead>
+    <tr>
+      <th class="text-left">Name</th>
+      
+        <th>Iterations per Second</th>
+      
+      <th>Average</th>
+      <th>Deviation</th>
+      <th>Median</th>
+      <th>Mode</th>
+      <th>Minimum</th>
+      <th>Maximum</th>
+      <th>Sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+      
+      <tr>
+        
+          <td class="text-left">POA / 1 nodes / 100 tx</td>
+        
+        
+          <td>4.98</td>
+          <td>200.70 ms</td>
+          <td>±1.05%</td>
+          <td>200.01 ms</td>
+          <td>none</td>
+          <td>199.86 ms</td>
+          <td>209.97 ms</td>
+        
+        <td>25</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+        </section>
+
+        <section class="benchee-plot-container">
+          <div id="run-times-histogram" class="plot"></div>
+        </section>
+        <section class="benchee-plot-container">
+          <div id="raw-run-times" class="plot"></div>
+        </section>
+      </article>
+    
+
+    
+
+    <footer>
+      <a href="https://github.com/PragTob/benchee" target="blank">benchee version: 1.4.0 </a>
+<br/>
+<a href="https://github.com/PragTob/benchee_html" target="blank">benchee_html version: 1.0.1</a>
+
+
+    </footer>
+
+    
+  <script src="assets/javascripts/plotly-2.27.0.min.js"></script>
+  <script src="assets/javascripts/benchee.js"></script>
+
+
+
+    <script>
+      var scenario = {"name":"POA / 1 nodes / 100 tx","job_name":"POA / 1 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":209971791,"mode":null,"average":200697806.56,"median":200007042.0,"percentiles":{"50":200007042.0,"99":209971791.0},"minimum":199855167,"sample_size":25,"std_dev":2105860.187392258,"ips":4.982615491121688,"std_dev_ratio":0.010492691591837086,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":0.05228104766904975},"samples":[199892000,199869083,200014792,201115292,199990666,202840208,199967208,202977958,200094458,199973167,199969333,199906291,200068333,200952333,209971791,199964292,199943458,199979000,200012042,200005750,200036709,199855167,200007042,200019708,200019083]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null};
+
+      var inputHeadline = ""
+
+      
+        drawRunTimeHistogram(scenario, inputHeadline);
+        drawRawRunTimeChart(scenario, inputHeadline);
+      
+
+      
+    </script>
+  </body>
+</html>

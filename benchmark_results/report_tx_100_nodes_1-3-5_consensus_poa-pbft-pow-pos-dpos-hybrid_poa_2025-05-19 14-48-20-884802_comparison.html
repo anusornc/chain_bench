@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Benchee Report</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/benchee.css">
+    <link rel="stylesheet" type="text/css" href="assets/fontello/css/fontello.css">
+  
+</head>
+
+  <body>
+
+    <div class="header">
+  <h1>benchee report</h1>
+  
+
+  <span class="version-note">
+  <a href="javascript:toggleSystemDataInfo();" title="Click to toggle system info">System info</a>
+</span>
+
+</div>
+
+
+    <article id="system-info" class="benchee-systeminfo" >
+  <h3>System info</h3>
+  <ul class="benchee-systeminfo-list">
+    <li>Elixir: 1.18.3</li>
+    <li>Erlang: 27.3.4</li>
+    <li>Operating system: macOS</li>
+    <li>Available memory: 8 GB</li>
+    <li>CPU Information: Apple M1</li>
+    <li>Number of Available Cores: 8</li>
+  </ul>
+</article>
+
+
+    
+      <article>
+        <h2>
+          Run Time Comparison
+          <a href="https://github.com/PragTob/benchee_html/wiki/Chart-Types#comparison">
+            <i
+            class="benchee-help-icon icon-question-circle-o"
+            title="Comparisons of the different benchmarking jobs. For Iterations per Second higher is better, the black whiskers denote standard deviation. otherwise it is runtime so lower is better. The Box Plot shows a distribution of run times with the median and outliers."
+            ></i>
+          </a>
+        </h2>
+        <section>
+          <table>
+  <thead>
+    <tr>
+      <th class="text-left">Name</th>
+      
+        <th>Iterations per Second</th>
+      
+      <th>Average</th>
+      <th>Deviation</th>
+      <th>Median</th>
+      <th>Mode</th>
+      <th>Minimum</th>
+      <th>Maximum</th>
+      <th>Sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_poa___1_nodes___100_tx.html">POA / 1 nodes / 100 tx</a></td>
+        
+        
+          <td>4.98</td>
+          <td>200.70 ms</td>
+          <td>±1.05%</td>
+          <td>200.01 ms</td>
+          <td>none</td>
+          <td>199.86 ms</td>
+          <td>209.97 ms</td>
+        
+        <td>25</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_poa___5_nodes___100_tx.html">POA / 5 nodes / 100 tx</a></td>
+        
+        
+          <td>4.98</td>
+          <td>200.90 ms</td>
+          <td>±1.86%</td>
+          <td>200.06 ms</td>
+          <td>none</td>
+          <td>199.69 ms</td>
+          <td>218.70 ms</td>
+        
+        <td>25</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pbft___1_nodes___100_tx.html">PBFT / 1 nodes / 100 tx</a></td>
+        
+        
+          <td>4.97</td>
+          <td>201.03 ms</td>
+          <td>±1.07%</td>
+          <td>200.01 ms</td>
+          <td>none</td>
+          <td>199.54 ms</td>
+          <td>207.00 ms</td>
+        
+        <td>25</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_poa___3_nodes___100_tx.html">POA / 3 nodes / 100 tx</a></td>
+        
+        
+          <td>4.97</td>
+          <td>201.08 ms</td>
+          <td>±1.12%</td>
+          <td>200.10 ms</td>
+          <td>none</td>
+          <td>199.66 ms</td>
+          <td>207.91 ms</td>
+        
+        <td>25</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pbft___3_nodes___100_tx.html">PBFT / 3 nodes / 100 tx</a></td>
+        
+        
+          <td>4.96</td>
+          <td>201.56 ms</td>
+          <td>±1.72%</td>
+          <td>200.03 ms</td>
+          <td>none</td>
+          <td>199.43 ms</td>
+          <td>214.09 ms</td>
+        
+        <td>25</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_hybrid_poa___5_nodes___100_tx.html">HYBRID_POA / 5 nodes / 100 tx</a></td>
+        
+        
+          <td>3.98</td>
+          <td>251.13 ms</td>
+          <td>±2.48%</td>
+          <td>250.47 ms</td>
+          <td>none</td>
+          <td>240.03 ms</td>
+          <td>266.10 ms</td>
+        
+        <td>20</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_hybrid_poa___3_nodes___100_tx.html">HYBRID_POA / 3 nodes / 100 tx</a></td>
+        
+        
+          <td>3.95</td>
+          <td>253.18 ms</td>
+          <td>±3.31%</td>
+          <td>252.92 ms</td>
+          <td>none</td>
+          <td>240.06 ms</td>
+          <td>273.96 ms</td>
+        
+        <td>20</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_hybrid_poa___1_nodes___100_tx.html">HYBRID_POA / 1 nodes / 100 tx</a></td>
+        
+        
+          <td>3.92</td>
+          <td>254.94 ms</td>
+          <td>±5.22%</td>
+          <td>250.48 ms</td>
+          <td>none</td>
+          <td>242.04 ms</td>
+          <td>293.94 ms</td>
+        
+        <td>20</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pbft___5_nodes___100_tx.html">PBFT / 5 nodes / 100 tx</a></td>
+        
+        
+          <td>3.32</td>
+          <td>301.33 ms</td>
+          <td>±0.89%</td>
+          <td>300.69 ms</td>
+          <td>none</td>
+          <td>299.93 ms</td>
+          <td>310.98 ms</td>
+        
+        <td>17</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pos___3_nodes___100_tx.html">POS / 3 nodes / 100 tx</a></td>
+        
+        
+          <td>2.51</td>
+          <td>398.20 ms</td>
+          <td>±1.58%</td>
+          <td>398.05 ms</td>
+          <td>none</td>
+          <td>387.99 ms</td>
+          <td>407.94 ms</td>
+        
+        <td>13</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pos___1_nodes___100_tx.html">POS / 1 nodes / 100 tx</a></td>
+        
+        
+          <td>2.48</td>
+          <td>402.93 ms</td>
+          <td>±2.34%</td>
+          <td>403.50 ms</td>
+          <td>none</td>
+          <td>387.79 ms</td>
+          <td>422.57 ms</td>
+        
+        <td>13</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_dpos___5_nodes___100_tx.html">DPOS / 5 nodes / 100 tx</a></td>
+        
+        
+          <td>2.48</td>
+          <td>403.13 ms</td>
+          <td>±2.26%</td>
+          <td>400.25 ms</td>
+          <td>none</td>
+          <td>399.71 ms</td>
+          <td>432.97 ms</td>
+        
+        <td>13</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_dpos___1_nodes___100_tx.html">DPOS / 1 nodes / 100 tx</a></td>
+        
+        
+          <td>2.47</td>
+          <td>405.31 ms</td>
+          <td>±1.46%</td>
+          <td>402.96 ms</td>
+          <td>none</td>
+          <td>399.72 ms</td>
+          <td>417.89 ms</td>
+        
+        <td>13</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_dpos___3_nodes___100_tx.html">DPOS / 3 nodes / 100 tx</a></td>
+        
+        
+          <td>2.44</td>
+          <td>409.13 ms</td>
+          <td>±4.22%</td>
+          <td>401.98 ms</td>
+          <td>none</td>
+          <td>399.77 ms</td>
+          <td>462.09 ms</td>
+        
+        <td>13</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pos___5_nodes___100_tx.html">POS / 5 nodes / 100 tx</a></td>
+        
+        
+          <td>2.44</td>
+          <td>409.69 ms</td>
+          <td>±4.49%</td>
+          <td>409.88 ms</td>
+          <td>none</td>
+          <td>373.25 ms</td>
+          <td>435.78 ms</td>
+        
+        <td>13</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pow___3_nodes___100_tx.html">POW / 3 nodes / 100 tx</a></td>
+        
+        
+          <td>1.11</td>
+          <td>897.47 ms</td>
+          <td>±1.26%</td>
+          <td>898.46 ms</td>
+          <td>none</td>
+          <td>878.99 ms</td>
+          <td>913.96 ms</td>
+        
+        <td>6</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pow___1_nodes___100_tx.html">POW / 1 nodes / 100 tx</a></td>
+        
+        
+          <td>1.11</td>
+          <td>900.12 ms</td>
+          <td>±1.96%</td>
+          <td>899.50 ms</td>
+          <td>none</td>
+          <td>877.07 ms</td>
+          <td>922.97 ms</td>
+        
+        <td>6</td>
+      </tr>
+    
+      
+      <tr>
+        
+          <td class="text-left"><a href="report_tx_100_nodes_1-3-5_consensus_poa-pbft-pow-pos-dpos-hybrid_poa_2025-05-19 14-48-20-884802_pow___5_nodes___100_tx.html">POW / 5 nodes / 100 tx</a></td>
+        
+        
+          <td>1.10</td>
+          <td>906.15 ms</td>
+          <td>±1.01%</td>
+          <td>907.48 ms</td>
+          <td>none</td>
+          <td>894.94 ms</td>
+          <td>917.07 ms</td>
+        
+        <td>6</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+        </section>
+
+        <section class="benchee-plot-container">
+          <div id="ips-comparison" class=" plot"></div>
+        </section>
+
+        <section class="benchee-plot-container">
+          <div id="run-time-box-plot" class=" plot"></div>
+        </section>
+      </article>
+    
+
+    
+
+    <footer>
+      <a href="https://github.com/PragTob/benchee" target="blank">benchee version: 1.4.0 </a>
+<br/>
+<a href="https://github.com/PragTob/benchee_html" target="blank">benchee_html version: 1.0.1</a>
+
+
+    </footer>
+
+    
+  <script src="assets/javascripts/plotly-2.27.0.min.js"></script>
+  <script src="assets/javascripts/benchee.js"></script>
+
+
+
+    <script>
+      var scenarios     = [{"name":"POA / 1 nodes / 100 tx","job_name":"POA / 1 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":209971791,"mode":null,"average":200697806.56,"median":200007042.0,"percentiles":{"50":200007042.0,"99":209971791.0},"minimum":199855167,"sample_size":25,"std_dev":2105860.187392258,"ips":4.982615491121688,"std_dev_ratio":0.010492691591837086,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":0.05228104766904975},"samples":[199892000,199869083,200014792,201115292,199990666,202840208,199967208,202977958,200094458,199973167,199969333,199906291,200068333,200952333,209971791,199964292,199943458,199979000,200012042,200005750,200036709,199855167,200007042,200019708,200019083]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POA / 5 nodes / 100 tx","job_name":"POA / 5 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":218700667,"mode":null,"average":200901690.16,"median":200057375.0,"percentiles":{"50":200057375.0,"99":218700667.0},"minimum":199691417,"sample_size":25,"std_dev":3741382.2962638824,"ips":4.977558920502812,"std_dev_ratio":0.018622950823779582,"relative_more":1.0010158735837456,"absolute_difference":203883.59999999404,"relative_less":0.9989851573680758,"std_dev_ips":0.09269683499898924},"samples":[200105875,199698709,200159500,200306834,199772542,199745459,199921083,200458750,199729625,200127792,199691417,200043750,200186959,218700667,201100583,201912833,200906542,200057375,199999709,200081458,199918541,199819959,200167917,199881416,200046959]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"PBFT / 1 nodes / 100 tx","job_name":"PBFT / 1 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":206999834,"mode":null,"average":201033836.64,"median":200006417.0,"percentiles":{"50":200006417.0,"99":206999834.0},"minimum":199536833,"sample_size":25,"std_dev":2144331.102046799,"ips":4.974286999211697,"std_dev_ratio":0.010666518322916683,"relative_more":1.0016743086820907,"absolute_difference":336030.0799999833,"relative_less":0.998328489941712,"std_dev_ips":0.053058323420537803},"samples":[199733500,200021750,199957208,200000584,200024333,203999000,206976959,199990333,200006417,199979916,200493709,199536833,199894416,199998833,202017666,199971916,199963958,204010375,200990750,206999834,200009375,199981292,199952375,200021667,201312917]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POA / 3 nodes / 100 tx","job_name":"POA / 3 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":207910708,"mode":null,"average":201083899.96,"median":200102667.0,"percentiles":{"50":200102667.0,"99":207910708.0},"minimum":199656750,"sample_size":25,"std_dev":2251501.587057633,"ips":4.973048564300384,"std_dev_ratio":0.011196826735036997,"relative_more":1.00192375495586,"absolute_difference":386093.40000000596,"relative_less":0.9980799387714441,"std_dev_ips":0.05568236311939589},"samples":[199829000,201916250,200316917,200483500,200340583,199656750,205999958,205988167,201013292,200949791,203159917,199747791,200200000,199980542,199947292,199768333,199959542,200102667,200005375,207910708,199916208,199872625,200042417,200323041,199666833]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"PBFT / 3 nodes / 100 tx","job_name":"PBFT / 3 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":214088375,"mode":null,"average":201557570.0,"median":200028375.0,"percentiles":{"50":200028375.0,"99":214088375.0},"minimum":199427166,"sample_size":25,"std_dev":3473597.33298777,"ips":4.96136165959929,"std_dev_ratio":0.01723377262877187,"relative_more":1.004283870634844,"absolute_difference":859763.4399999976,"relative_less":0.9957344026324588,"std_dev_ips":0.08550297877064042},"samples":[199427166,202902500,200001083,201955375,200028375,201941708,200010292,200025333,200053791,199919042,210953166,200001542,199871542,201090417,199982417,199973625,199951333,202901750,214088375,202016542,199934667,200991791,200855250,200072209,199989959]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"HYBRID_POA / 5 nodes / 100 tx","job_name":"HYBRID_POA / 5 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":266101625,"mode":null,"average":251133570.8,"median":250467562.0,"percentiles":{"50":250467562.0,"99":266101625.0},"minimum":240033792,"sample_size":20,"std_dev":6229647.678680651,"ips":3.981944734885281,"std_dev_ratio":0.02480611277431273,"relative_more":1.2513020202087852,"absolute_difference":50435764.24000001,"relative_less":0.7991675741346166,"std_dev_ips":0.09877657015464508},"samples":[255398750,244435875,248968416,254024417,255943458,266101625,242904625,246053458,255927125,252990334,259045625,247062042,248924583,255973041,251966708,245974459,240033792,247064125,248915708,254963250]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"HYBRID_POA / 3 nodes / 100 tx","job_name":"HYBRID_POA / 3 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":273959542,"mode":null,"average":253181283.5,"median":252923062.5,"percentiles":{"50":252923062.5,"99":273959542.0},"minimum":240061000,"sample_size":20,"std_dev":8387459.302904209,"ips":3.949739041432737,"std_dev_ratio":0.03312827546710896,"relative_more":1.261504985229172,"absolute_difference":52483476.94,"relative_less":0.7927039620999473,"std_dev_ips":0.1308480429877786},"samples":[264920667,250980917,257003917,244962792,243940791,240061000,252895125,256039084,247004750,249924959,263115958,244831292,246994625,245088792,273959542,253062542,258806125,259993875,257087917,252951000]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"HYBRID_POA / 1 nodes / 100 tx","job_name":"HYBRID_POA / 1 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":293941208,"mode":null,"average":254940191.65,"median":250480916.5,"percentiles":{"50":250480916.5,"99":293941208.0},"minimum":242036125,"sample_size":20,"std_dev":13319421.655801635,"ips":3.92248861792993,"std_dev_ratio":0.05224527984229133,"relative_more":1.2702689482248222,"absolute_difference":54242385.09,"relative_less":0.7872348618751028,"std_dev_ips":0.20493151552195174},"samples":[260952500,256987708,257023584,256021667,249938584,247994208,250942792,256054667,247978875,288062417,293941208,250008791,246945167,253057083,242036125,244854875,243956083,250019041,255018541,247009917]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"PBFT / 5 nodes / 100 tx","job_name":"PBFT / 5 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":310982458,"mode":null,"average":301334441.1764706,"median":300686417.0,"percentiles":{"50":300686417.0,"99":310982458.0},"minimum":299927083,"sample_size":17,"std_dev":2671427.723801878,"ips":3.3185718701645848,"std_dev_ratio":0.008865324897386718,"relative_more":1.5014336546143794,"absolute_difference":100636634.61647058,"relative_less":0.6660300952537492,"std_dev_ips":0.029420217824337295},"samples":[310982458,300875917,300213042,303860375,300920708,299954791,300012542,300686417,300354500,301003709,300949542,299956333,300067750,301993458,300885542,300041333,299927083]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POS / 3 nodes / 100 tx","job_name":"POS / 3 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":407944461,"mode":null,"average":398202980.15384614,"median":398054746.0,"percentiles":{"50":398054746.0,"99":407944461.0},"minimum":387990952,"sample_size":13,"std_dev":6296894.146063714,"ips":2.511282059249403,"std_dev_ratio":0.015813277298002398,"relative_more":1.984092337525376,"absolute_difference":197505173.59384614,"relative_less":0.5040088009448352,"std_dev_ips":0.0397115995764093},"samples":[397838252,396916871,388342273,398054746,387990952,401045384,394647581,402711864,404994445,402058305,407944461,403083142,391010466]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POS / 1 nodes / 100 tx","job_name":"POS / 1 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":422574167,"mode":null,"average":402932336.61538464,"median":403499875.0,"percentiles":{"50":403499875.0,"99":422574167.0},"minimum":387791085,"sample_size":13,"std_dev":9436980.296473827,"ips":2.4818062714945137,"std_dev_ratio":0.023420756883758897,"relative_more":2.0076569022936743,"absolute_difference":202234530.05538464,"relative_less":0.49809307499580074,"std_dev_ips":0.058125781317261135},"samples":[406504375,407804583,403499875,407541084,400953974,413200724,387791085,402525204,422574167,392869687,392344499,394854156,405656963]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"DPOS / 5 nodes / 100 tx","job_name":"DPOS / 5 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":432968625,"mode":null,"average":403132410.2307692,"median":400246292.0,"percentiles":{"50":400246292.0,"99":432968625.0},"minimum":399711542,"sample_size":13,"std_dev":9096493.516422488,"ips":2.4805745571971247,"std_dev_ratio":0.022564530376546228,"relative_more":2.008653792189054,"absolute_difference":202434603.6707692,"relative_less":0.4978458726380062,"std_dev_ips":0.055972999947162226},"samples":[399848416,399990208,399711542,400409500,399870875,432968625,399991000,400759584,400033583,400246292,405616333,400254250,401021125]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"DPOS / 1 nodes / 100 tx","job_name":"DPOS / 1 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":417894583,"mode":null,"average":405313076.84615386,"median":402961625.0,"percentiles":{"50":402961625.0,"99":417894583.0},"minimum":399721542,"sample_size":13,"std_dev":5904534.334193297,"ips":2.4672285626243773,"std_dev_ratio":0.014567835758318012,"relative_more":2.0195192154478416,"absolute_difference":204615270.28615385,"relative_less":0.49516736080089413,"std_dev_ips":0.03594218047854295},"samples":[400146833,400083458,417894583,408018375,402961625,402784333,401234875,408184167,408701041,400083125,414851917,399721542,404404125]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"DPOS / 3 nodes / 100 tx","job_name":"DPOS / 3 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":462092500,"mode":null,"average":409127782.0769231,"median":401975917.0,"percentiles":{"50":401975917.0,"99":4.620925e8},"minimum":399775000,"sample_size":13,"std_dev":17263584.632591367,"ips":2.444224136829659,"std_dev_ratio":0.042196070247181396,"relative_more":2.038526424824735,"absolute_difference":208429975.51692307,"relative_less":0.49055042300272184,"std_dev_ips":0.10313665337752059},"samples":[400770708,399775000,400147334,399956417,420059750,403990250,409013041,400933416,417027792,403010417,399908625,462092500,401975917]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POS / 5 nodes / 100 tx","job_name":"POS / 5 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":435776676,"mode":null,"average":409689960.3076923,"median":409878556.0,"percentiles":{"50":409878556.0,"99":435776676.0},"minimum":373245959,"sample_size":13,"std_dev":18381998.091529287,"ips":2.440870162522321,"std_dev_ratio":0.04486807066915608,"relative_more":2.0413275427861373,"absolute_difference":208992153.7476923,"relative_less":0.4898772877159805,"std_dev_ips":0.10951713494628598},"samples":[394274052,400895056,430938939,427249952,431535668,414327766,435776676,409878556,413181142,391611986,373245959,401814814,401238918]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POW / 3 nodes / 100 tx","job_name":"POW / 3 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":913959319,"mode":null,"average":897468778.6666666,"median":898463832.0,"percentiles":{"50":898463832.0,"99":913959319.0},"minimum":878985326,"sample_size":6,"std_dev":11319611.799979039,"ips":1.1142448893717058,"std_dev_ratio":0.012612819597798301,"relative_more":4.471741839382595,"absolute_difference":696770972.1066666,"relative_less":0.22362650526759123,"std_dev_ips":0.014053769777414052},"samples":[893982519,897837626,913959319,900957844,878985326,899090038]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POW / 1 nodes / 100 tx","job_name":"POW / 1 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":922965817,"mode":null,"average":900119652.3333334,"median":899504522.5,"percentiles":{"50":899504522.5,"99":922965817.0},"minimum":877070606,"sample_size":6,"std_dev":17664395.76677415,"ips":1.1109634118172533,"std_dev_ratio":0.01962449738874566,"relative_more":4.484950123579135,"absolute_difference":699421845.7733333,"relative_less":0.22296791992013673,"std_dev_ips":0.021802098574199655},"samples":[915782293,877070606,885890153,894101057,904907988,922965817]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null},{"name":"POW / 5 nodes / 100 tx","job_name":"POW / 5 nodes / 100 tx","input_name":"__no_input","run_time_data":{"statistics":{"maximum":917069745,"mode":null,"average":906153074.0,"median":907482788.5,"percentiles":{"50":907482788.5,"99":917069745.0},"minimum":894942525,"sample_size":6,"std_dev":9151385.747574057,"ips":1.1035663053988602,"std_dev_ratio":0.01009916095873009,"relative_more":4.515012343839937,"absolute_difference":705455267.44,"relative_less":0.22148333688707433,"std_dev_ips":0.011145093746854176},"samples":[909135707,895967779,913972818,894942525,905829870,917069745]},"memory_usage_data":{"statistics":{"maximum":null,"mode":null,"average":null,"median":null,"percentiles":null,"minimum":null,"sample_size":0,"std_dev":null,"ips":null,"std_dev_ratio":null,"relative_more":null,"absolute_difference":null,"relative_less":null,"std_dev_ips":null},"samples":[]},"tag":null}];
+      var inputHeadline = "";
+
+      
+        drawIpsComparisonChart(scenarios, inputHeadline);
+        drawRunTimeComparisonBoxPlot(scenarios, inputHeadline);
+      
+
+      
+    </script>
+  </body>
+</html>
