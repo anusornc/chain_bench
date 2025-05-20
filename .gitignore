@@ -21,3 +21,6 @@ chain_bench-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+/benchmark_graph_results_enhanced/
+/benchmark_results/

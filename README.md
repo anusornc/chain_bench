@@ -82,7 +82,7 @@ This suite creates different graph structures (Blockchain, DAG, BlockDAG) and be
 
 * **With default settings**:
     ```bash
-    mix run.graph_benchmark
+    mix run_graph_benchmark
     ```
     *Default graph benchmark settings include:*
     * Graph sizes (total transactions): 500, 1000, 1500

@@ -1,44 +1,50 @@
-defmodule Mix.Tasks.RunBenchmark do
+defmodule Mix.Tasks.RunBenchmark do # หรือ Mix.Tasks.Run_Benchmark ขึ้นอยู่กับการตั้งชื่อโมดูลของคุณ
   use Mix.Task
   require Logger
 
-  @shortdoc "Runs the blockchain consensus benchmark using Benchee with configurable options."
+  # --- ค่า Default สำหรับ options ต่างๆ ---
+  @default_tx_count 100                             # จำนวนธุรกรรมเริ่มต้น
+  @default_node_counts_str "1,3,5"                  # รายการจำนวนโหนดเริ่มต้น (เป็น string)
+  @default_consensus_types_str "poa,pbft,pow,pos,dpos,hybrid_poa" # รายการ consensus algorithms เริ่มต้น (เป็น string)
+  @default_warmup 2                                 # เวลา warmup เริ่มต้น (วินาที)
+  @default_time 5                                   # เวลาที่ใช้ในการวัดผลเริ่มต้น (วินาที)
+  @default_output_path "benchmark_results"          # ไดเรกทอรีสำหรับเก็บผลลัพธ์เริ่มต้น
+
+  @shortdoc "Runs the blockchain consensus benchmark using Benchee."
+  # คำอธิบายสั้นๆ ของ Mix task นี้
   @moduledoc """
   Runs the blockchain consensus benchmark using Benchee.
-  Output filenames for Benchee reports (HTML, JSON) will be generated dynamically.
+  Outputs Benchee HTML report and a Vega-Lite JSON specification.
+  รัน benchmark สำหรับ consensus ของ blockchain โดยใช้ Benchee
+  สร้างรายงานผลลัพธ์เป็น HTML และ JSON ในรูปแบบ Vega-Lite
 
-  ## Command-line options
+  ## Command-line options (ตัวเลือกบรรทัดคำสั่ง)
 
-    * `-t N`, `--transactions N`: Sets the number of transactions to N (e.g., 500). Default: 100.
-    * `-n LIST`, `--nodes LIST`: Sets the node counts as a comma-separated list (e.g., "1,5,10"). Default: "1,3,5".
-    * `-c LIST`, `--consensus LIST`: Sets a comma-separated list of consensus
-      algorithms to test (e.g., "poa,pbft,hybrid_poa"). Default: "poa,pbft".
-    * `--warmup S`: Benchee warmup time in seconds. Default: 2.
-    * `--time S`: Benchee measurement time in seconds. Default: 5.
-    * `--output PATH`: Directory for Benchee reports. Default: "benchmark_results".
+    * `-t N`, `--transactions N`: Sets the number of transactions to N. Default: #{@default_tx_count}.
+      (กำหนดจำนวนธุรกรรมเป็น N. ค่าเริ่มต้น: #{@default_tx_count})
+    * `-n LIST`, `--nodes LIST`: Sets node counts as a comma-separated list. Default: "#{@default_node_counts_str}".
+      (กำหนดจำนวนโหนดเป็นรายการคั่นด้วยจุลภาค. ค่าเริ่มต้น: "#{@default_node_counts_str}")
+    * `-c LIST`, `--consensus LIST`: Sets consensus algorithms. Default: "#{@default_consensus_types_str}".
+      (กำหนด consensus algorithms เป็นรายการคั่นด้วยจุลภาค. ค่าเริ่มต้น: "#{@default_consensus_types_str}")
+    * `--warmup S`: Benchee warmup time in seconds. Default: #{@default_warmup}.
+      (กำหนดเวลา warmup ของ Benchee เป็นวินาที. ค่าเริ่มต้น: #{@default_warmup})
+    * `--time S`: Benchee measurement time in seconds. Default: #{@default_time}.
+      (กำหนดเวลาที่ใช้ในการวัดผลของ Benchee เป็นวินาที. ค่าเริ่มต้น: #{@default_time})
+    * `--output PATH`: Directory for reports. Default: "#{@default_output_path}".
+      (กำหนดไดเรกทอรีสำหรับเก็บรายงาน. ค่าเริ่มต้น: "#{@default_output_path}")
 
-  ## Examples
+  ## Examples (ตัวอย่างการใช้งาน)
 
-      mix run.benchmark
-      mix run.benchmark --transactions 1000 --nodes 1,5,10,20
-      mix run.benchmark -t 200 -n 1,3,5 -c poa,hybrid_poa --warmup 1 --time 3
-      mix run.benchmark --output custom_reports
+      mix run_benchmark # หรือ mix run.benchmark ขึ้นอยู่กับการตั้งชื่อ task ของคุณ
+      mix run_benchmark -t 500 -n 1,5,10 -c pow,pos
   """
 
-  # Default values
-  @default_tx_count 100
-  @default_node_counts_str "1,3,5" # Default as string for parsing
-  @default_consensus_types_str "poa,pbft,pow,pos,dpos,hybrid_poa"
-  @default_warmup 2
-  @default_time 5
-  @default_output_path "benchmark_results"
-
+  # ฟังก์ชันหลักที่ Mix จะเรียกเมื่อรัน task นี้
   def run(args) do
-    # Ensure the application is started, especially for config values from config.exs
-    # Use the correct application name for your project (e.g., :chain_bench)
+    # ตรวจสอบให้แน่ใจว่าแอปพลิเคชัน (:chain_bench) ได้เริ่มทำงานแล้ว (เพื่อให้ config ถูกโหลด)
     Application.ensure_all_started(:chain_bench)
-    # Configure Logger level if desired, e.g., Application.put_env(:logger, :level, :info)
 
+    # กำหนด switches และ aliases สำหรับการ parse command-line arguments
     switches = [
       transactions: :integer,
       nodes: :string,
@@ -47,10 +53,13 @@ defmodule Mix.Tasks.RunBenchmark do
       time: :integer,
       output: :string
     ]
-    aliases = [t: :transactions, n: :nodes, c: :consensus]
+    aliases = [t: :transactions, n: :nodes, c: :consensus] # ตัวย่อสำหรับ options
 
+    # Parse command-line arguments
     case OptionParser.parse(args, switches: switches, aliases: aliases) do
-      {parsed_opts, _parsed_args, []} ->
+      # กรณี parse สำเร็จและไม่มี options ที่ไม่ถูกต้อง
+      {parsed_opts, _remaining_args, []} ->
+        # ดึงค่า options ที่ parse ได้ หรือใช้ค่า default ถ้าไม่ได้ระบุ
         tx_count = Keyword.get(parsed_opts, :transactions, @default_tx_count)
         node_counts_str = Keyword.get(parsed_opts, :nodes, @default_node_counts_str)
         consensus_str = Keyword.get(parsed_opts, :consensus, @default_consensus_types_str)
@@ -58,109 +67,93 @@ defmodule Mix.Tasks.RunBenchmark do
         time_s = Keyword.get(parsed_opts, :time, @default_time)
         output_p = Keyword.get(parsed_opts, :output, @default_output_path)
 
-
+        # แปลง string ของ node counts และ consensus types ให้อยู่ในรูปแบบที่ต้องการ
         node_counts_to_run = parse_node_argument(node_counts_str)
         consensus_to_run = parse_consensus_argument(consensus_str)
 
+        # ตรวจสอบความถูกต้องของ options ที่แปลงแล้ว
         cond do
-          node_counts_to_run == :error_parsing ->
-            Mix.shell().error(
-              "Invalid format for --nodes. Please use comma-separated positive numbers (e.g., '1,5,10')."
-            )
-            exit({:shutdown, 1})
-
-          Enum.empty?(node_counts_to_run) and node_counts_str != "" -> # Error if not empty string but parsed to empty
-             Mix.shell().error(
-              "Node list cannot be empty or contained only invalid values. Please provide valid positive numbers for --nodes (e.g., '1,5,10')."
-            )
-            exit({:shutdown, 1})
-
-          consensus_to_run == :error_parsing ->
-            Mix.shell().error(
-              "Invalid format for --consensus. Please use comma-separated algorithm names (e.g., 'poa,pbft')."
-            )
-            exit({:shutdown, 1})
-
-          Enum.empty?(consensus_to_run) and consensus_str != "" -> # Error if not empty string but parsed to empty
-            Mix.shell().error(
-              "Consensus list cannot be empty or contained only invalid values. Please provide valid algorithm names for --consensus (e.g., 'poa,pbft')."
-            )
-            exit({:shutdown, 1})
-
+          # กรณี node counts ไม่ถูกต้อง
+          node_counts_to_run == :error_parsing or (Enum.empty?(node_counts_to_run) and node_counts_str != "") ->
+            error_exit("Invalid format for --nodes. Use comma-separated positive numbers.")
+          # กรณี consensus types ไม่ถูกต้อง
+          consensus_to_run == :error_parsing or (Enum.empty?(consensus_to_run) and consensus_str != "") ->
+            error_exit("Invalid format for --consensus. Use comma-separated algorithm names.")
+          # กรณี options ถูกต้องทั้งหมด
           true ->
+            # สร้าง map ของ options ที่จะส่งให้ BenchmarkRunner
             run_opts = %{
               transactions: tx_count,
-              nodes: node_counts_to_run, # This is now a list of integers
-              consensus: consensus_to_run, # This is a list of atoms
+              nodes: node_counts_to_run,
+              consensus: consensus_to_run,
               warmup: warmup_s,
               time: time_s,
               output_path: output_p
             }
 
-            Logger.info("Starting Benchee benchmark suite with options: #{inspect(run_opts)}")
-            Mix.shell().info("Benchee running... This may take some time depending on configuration.")
+            Logger.info("Starting Consensus Benchmark suite with options: #{inspect(run_opts)}") # แจ้ง log ว่ากำลังเริ่ม benchmark
+            Mix.shell().info("Benchee running for consensus benchmarks... This may take some time.") # แจ้งผู้ใช้
 
-            # Corrected call to the namespaced BenchmarkRunner module
+            # เรียก ChainBench.BenchmarkRunner.run_suite เพื่อเริ่มการ benchmark
             case ChainBench.BenchmarkRunner.run_suite(run_opts) do
-              %{suite: %{jobs: jobs}} when is_map(jobs) -> # Basic check for Benchee result structure
-                Mix.shell().info(
-                  "Benchmark suite completed. Reports saved in '#{output_p}'. Check console for Benchee summary."
-                )
-              {:error, reason} ->
-                Mix.shell().error("Benchmark suite failed: #{inspect(reason)}")
-                exit({:shutdown, 1})
-              # Corrected variable name: removed leading underscore as it's used.
-              other_error ->
-                 Mix.shell().error("Benchmark suite encountered an unexpected error: #{inspect(other_error)}")
-                exit({:shutdown, 1})
+              {:ok, report_paths} -> # กรณี benchmark สำเร็จ
+                Mix.shell().info("Consensus Benchmark suite completed.")
+                Mix.shell().info("Benchee HTML report: #{report_paths.html_report}")
+                Mix.shell().info("Vega-Lite JSON spec: #{report_paths.vega_spec}")
+
+              {:error, reason} -> # กรณี benchmark ล้มเหลว (error ที่คาดไว้)
+                Mix.shell().error("Consensus Benchmark suite failed: #{inspect(reason)}")
+                exit({:shutdown, 1}) # ออกจากโปรแกรมพร้อม error code
+
+              other_unexpected_result -> # กรณีผลลัพธ์อื่นๆ ที่ไม่คาดคิด
+                 Mix.shell().error("Consensus Benchmark suite encountered an unexpected error: #{inspect(other_unexpected_result)}")
+                exit({:shutdown, 1}) # ออกจากโปรแกรมพร้อม error code
             end
         end
-
-      {_parsed_opts, _parsed_args, invalid_opts} ->
-        Mix.shell().error("Invalid option(s): #{inspect(invalid_opts)}")
-        Mix.shell().error("Use 'mix help #{__MODULE__}' for usage instructions.")
-        exit({:shutdown, 1})
+      # กรณีมี options ที่ไม่ถูกต้อง
+      {_parsed_opts, _remaining_args, invalid_opts} ->
+        error_exit("Invalid option(s): #{inspect(invalid_opts)}\nUse 'mix help #{__MODULE__}' for usage instructions.")
     end
   end
 
-  # Parses "1,2,3" into [1,2,3]
-  defp parse_node_argument(arg_string) when is_binary(arg_string) do
+  # ฟังก์ชันช่วยสำหรับ parse argument ของจำนวนโหนด (nodes)
+  defp parse_node_argument(arg_string) do
     try do
       arg_string
-      |> String.split(",", trim: true)
-      |> Enum.reject(&(&1 == "")) # Remove empty strings if user types "1,,2"
-      |> Enum.map(&String.to_integer/1)
-      |> Enum.filter(&(&1 > 0)) # Ensure positive node counts
+      |> String.split(",", trim: true)       # แยก string ด้วยจุลภาค และตัดช่องว่าง
+      |> Enum.reject(&(&1 == ""))            # ลบ string ว่างที่อาจเกิดขึ้น
+      |> Enum.map(&String.to_integer/1)     # แปลงแต่ละส่วนเป็น integer
+      |> Enum.filter(&(&1 > 0))             # กรองเอาเฉพาะค่าที่มากกว่า 0
       |> case do
-          # If the original string was not empty but parsing resulted in an empty list, it's an error.
-          [] -> if String.trim(arg_string) != "", do: :error_parsing, else: []
-          valid_list -> Enum.uniq(valid_list) |> Enum.sort() # Unique and sorted
+           # ถ้าผลลัพธ์เป็น list ว่าง แต่ input string ไม่ใช่ string ว่าง แสดงว่า parse ผิดพลาด
+           [] -> if String.trim(arg_string) != "", do: :error_parsing, else: []
+           valid_list -> Enum.uniq(valid_list) |> Enum.sort() # ลบค่าซ้ำและเรียงลำดับ
          end
     rescue
-      ArgumentError ->
-        Logger.error("Error parsing node list: '#{arg_string}'. Contains non-integer or invalid values.")
-        :error_parsing
+      ArgumentError -> :error_parsing # ดักจับ error ถ้าแปลงเป็น integer ไม่ได้
     end
   end
-  defp parse_node_argument(_), do: :error_parsing # Catch-all for invalid types
 
-  # Parses "poa,pbft" into [:poa, :pbft]
-  defp parse_consensus_argument(arg_string) when is_binary(arg_string) do
+  # ฟังก์ชันช่วยสำหรับ parse argument ของประเภท consensus
+  defp parse_consensus_argument(arg_string) do
     try do
       arg_string
-      |> String.split(",", trim: true)
-      |> Enum.reject(&(&1 == "")) # Remove empty strings
-      |> Enum.map(&String.to_atom/1)
+      |> String.split(",", trim: true)       # แยก string ด้วยจุลภาค และตัดช่องว่าง
+      |> Enum.reject(&(&1 == ""))            # ลบ string ว่าง
+      |> Enum.map(&String.to_atom/1)        # แปลงแต่ละส่วนเป็น atom
       |> case do
-          # If the original string was not empty but parsing resulted in an empty list, it's an error.
-          [] -> if String.trim(arg_string) != "", do: :error_parsing, else: []
-          valid_list -> Enum.uniq(valid_list)
+           # ถ้าผลลัพธ์เป็น list ว่าง แต่ input string ไม่ใช่ string ว่าง แสดงว่า parse ผิดพลาด
+           [] -> if String.trim(arg_string) != "", do: :error_parsing, else: []
+           valid_list -> Enum.uniq(valid_list) # ลบค่าซ้ำ
          end
     rescue
-      ArgumentError -> # Catches errors from String.to_atom if format is invalid
-        Logger.error("Error parsing consensus list: '#{arg_string}'. Contains invalid atom format (e.g., starts with uppercase, contains spaces).")
-        :error_parsing
+      ArgumentError -> :error_parsing # ดักจับ error ถ้าแปลงเป็น atom ไม่ได้
     end
   end
-  defp parse_consensus_argument(_), do: :error_parsing # Catch-all for invalid types
+
+  # ฟังก์ชันช่วยสำหรับแสดง error message และออกจากโปรแกรม
+  defp error_exit(message) do
+    Mix.shell().error(message) # แสดง error message
+    exit({:shutdown, 1})       # ออกจากโปรแกรมด้วย status code 1
+  end
 end

@@ -1,50 +1,56 @@
 defmodule ChainBench.BenchmarkRunner do
   @moduledoc """
   Orchestrates blockchain consensus benchmarks using the Benchee library,
-  as part of the ChainBench application.
+  as part of the ChainBench application. Now includes Vega-Lite JSON output.
+  โมดูลนี้ทำหน้าที่จัดการและรัน benchmark สำหรับ consensus Pmechanism ต่างๆ โดยใช้ไลบรารี Benchee
+  และสร้างผลลัพธ์เป็น JSON ในรูปแบบ Vega-Lite สำหรับการแสดงผลกราฟ
   """
   require Logger
 
+  # Alias for the simulation functions if they are in a different module
+  # For example, if simulations are in ChainBench.BlockchainSimulations
+  # กำหนดชื่อย่อสำหรับโมดูลที่เก็บฟังก์ชันจำลองการทำงานของ consensus
+  alias ChainBench.BlockchainSimulations
+
   @doc """
   Runs the Benchee benchmark suite with options provided in a map.
+  รันชุด benchmark ด้วย Benchee โดยรับค่าพารามิเตอร์ต่างๆ ผ่าน map `opts`
 
   Args:
     - `opts`: A map containing benchmark options:
-      - `transactions`: Number of transactions (integer).
-      - `nodes`: A list of node counts (e.g., `[1, 5, 10]`).
-      - `consensus`: A list of consensus algorithm atoms (e.g., `[:poa, :pbft]`).
-      - `warmup`: Warmup time in seconds for Benchee.
-      - `time`: Measurement time in seconds for Benchee.
-      - `output_path`: Path to store benchmark reports.
+      - `transactions`: Number of transactions (integer). # จำนวนธุรกรรม
+      - `nodes`: A list of node counts (e.g., `[1, 5, 10]`). # รายการของจำนวนโหนดที่จะทดสอบ
+      - `consensus`: A list of consensus algorithm atoms (e.g., `[:poa, :pbft]`). # รายการของ consensus algorithm ที่จะทดสอบ
+      - `warmup`: Warmup time in seconds for Benchee. # เวลา warmup (วินาที)
+      - `time`: Measurement time in seconds for Benchee. # เวลาที่ใช้ในการวัดผล (วินาที)
+      - `output_path`: Path to store benchmark reports. # ตำแหน่งที่เก็บไฟล์รายงานผล
   """
   def run_suite(opts) do
-    # Ensure `opts` is a map, which it should be from the Mix task.
+    # ดึงค่าพารามิเตอร์จาก opts หรือใช้ค่า default
     tx_count = Map.fetch!(opts, :transactions)
-    node_counts_list = Map.fetch!(opts, :nodes) # Expects a list
+    node_counts_list = Map.fetch!(opts, :nodes)
     consensus_types_list = Map.fetch!(opts, :consensus)
+    warmup_time = Map.get(opts, :warmup, Application.get_env(:chain_bench, :benchee_warmup, 2))
+    measure_time = Map.get(opts, :time, Application.get_env(:chain_bench, :benchee_time, 5))
+    output_path = Map.get(opts, :output_path, "benchmark_results")
 
-    # Use Map.get/3 for maps, providing default values.
-    # The third argument to Map.get is the default value.
-    # For warmup and time, we check opts, then app config, then a hardcoded default.
-    warmup_time =
-      Map.get(opts, :warmup, Application.get_env(:chain_bench, :benchee_warmup, 2))
-
-    measure_time =
-      Map.get(opts, :time, Application.get_env(:chain_bench, :benchee_time, 5))
-
-    output_path =
-      Map.get(opts, :output_path, "benchmark_results") # Default to "benchmark_results" if not in opts
-
-    # Ensure the output directory exists
+    # สร้าง directory สำหรับเก็บผลลัพธ์ถ้ายังไม่มี
     File.mkdir_p(output_path)
 
-    # Start a single Task.Supervisor for all benchmark jobs in this suite.
-    supervisor_name = :"node_supervisor_#{System.unique_integer([:positive])}"
+    # สร้างชื่อไฟล์พื้นฐานสำหรับรายงานต่างๆ
+    filename_base = generate_filename_base(opts)
+    benchee_html_file = Path.join(output_path, filename_base <> "_benchee.html")
+    vega_spec_file = Path.join(output_path, filename_base <> "_vega_spec.json") # สำหรับ Vega-Lite plot
 
+    # สร้างชื่อที่ไม่ซ้ำกันสำหรับ Task.Supervisor
+    supervisor_name = :"consensus_node_supervisor_#{System.unique_integer([:positive])}"
+
+    # เริ่ม Task.Supervisor สำหรับจัดการ process ของโหนดจำลอง
     case Task.Supervisor.start_link(name: supervisor_name) do
       {:ok, supervisor_pid} ->
-        Logger.info("Task.Supervisor for nodes started: #{inspect(supervisor_pid)}")
+        Logger.info("Task.Supervisor for consensus nodes started: #{inspect(supervisor_pid)}") # Supervisor เริ่มทำงานแล้ว
 
+        # สร้างรายการ benchmark jobs สำหรับ Benchee
         benchmark_jobs =
           for consensus_type <- consensus_types_list,
               node_count <- node_counts_list,
@@ -52,8 +58,8 @@ defmodule ChainBench.BenchmarkRunner do
             job_name =
               "#{to_string(consensus_type) |> String.upcase()} / #{node_count} nodes / #{tx_count} tx"
 
+            # ฟังก์ชัน wrapper ที่ Benchee จะเรียกเพื่อรันการจำลอง
             simulation_fn_wrapper = fn ->
-              # Calls the appropriate simulation function from ChainBench.BlockchainSimulations.
               get_simulation_function(consensus_type).(tx_count, node_count, supervisor_pid)
             end
 
@@ -61,72 +67,83 @@ defmodule ChainBench.BenchmarkRunner do
           end
 
         if Enum.empty?(benchmark_jobs) do
-          Logger.warning("No benchmark jobs generated. Check input parameters.")
-          stop_supervisor(supervisor_pid)
-          %{suite: %{jobs: %{}, configuration: %{}}} # Return an empty-like Benchee result
+          Logger.warning("No consensus benchmark jobs generated. Check input parameters.") # ไม่มี job ถูกสร้าง
+          stop_supervisor(supervisor_pid) # สั่งหยุด Supervisor ถ้าไม่มี job
+          {:error, :no_benchmark_jobs_generated}
         else
           Logger.info(
-            "Configuring Benchee suite with #{Enum.count(benchmark_jobs)} jobs. " <>
+            "Configuring Benchee suite for consensus with #{Enum.count(benchmark_jobs)} jobs. " <>
               "Warmup: #{warmup_time}s, Time: #{measure_time}s."
-          )
+          ) # กำลังตั้งค่า Benchee
 
+          # ตั้งค่า Benchee
           benchee_config = [
             warmup: warmup_time,
             time: measure_time,
             formatters: [
-              Benchee.Formatters.Console,
-              {Benchee.Formatters.HTML, file: Path.join(output_path, generate_filename_part(opts) <> ".html")},
-              {Benchee.Formatters.JSON, file: Path.join(output_path, generate_filename_part(opts) <> ".json"), extended_json: true}
+              Benchee.Formatters.Console, # แสดงผลทาง console
+              {Benchee.Formatters.HTML, file: benchee_html_file} # สร้างรายงาน HTML
             ]
           ]
 
+          # รัน Benchee suite
           suite_results = Benchee.run(benchmark_jobs, benchee_config)
+          # สั่งหยุด Supervisor หลังจาก Benchee รันเสร็จ
           stop_supervisor(supervisor_pid)
-          Logger.info("Benchmark suite finished. Reports saved to #{output_path}")
-          suite_results
+          Logger.info("Consensus benchmark suite finished. Reports saved to #{output_path}") # Benchmark เสร็จสิ้น
+
+
+          # --- สร้างไฟล์ JSON ในรูปแบบ Vega-Lite ---
+          generate_vega_lite_spec(suite_results, vega_spec_file, tx_count)
+
+          # คืนค่า path ของไฟล์รายงานที่สร้างขึ้น
+          {:ok, %{html_report: benchee_html_file, vega_spec: vega_spec_file}}
         end
 
       {:error, reason} ->
-        Logger.error("Failed to start Task.Supervisor for nodes: #{inspect(reason)}")
+        Logger.error("Failed to start Task.Supervisor for consensus nodes: #{inspect(reason)}") # ไม่สามารถเริ่ม Supervisor ได้
         {:error, {:supervisor_start_failed, reason}}
     end
   end
 
+  # ฟังก์ชันสำหรับหยุด Task.Supervisor
   defp stop_supervisor(pid) do
     if Process.alive?(pid) do
-      Logger.info("Attempting to stop Task.Supervisor: #{inspect(pid)}")
-      Process.exit(pid, :shutdown)
-      Process.sleep(100) # Give it a moment
+      Logger.info("Attempting to stop Task.Supervisor: #{inspect(pid)}") # พยายามหยุด Supervisor
+      Process.unlink(pid) # ยกเลิกการ link process ปัจจุบันกับ Supervisor
+      Process.exit(pid, :normal) # สั่งให้ Supervisor ออกแบบปกติ
+      Process.sleep(100) # รอสักครู่ให้ process จัดการการออก
 
       unless Process.alive?(pid) do
-        Logger.info("Task.Supervisor for nodes stopped: #{inspect(pid)}")
+        Logger.info("Task.Supervisor for consensus nodes stopped: #{inspect(pid)}") # Supervisor หยุดทำงานแล้ว
       else
-        Logger.warning("Task.Supervisor #{inspect(pid)} might still be alive after :shutdown. Forcing exit with :kill.")
+        Logger.warning("Task.Supervisor #{inspect(pid)} still alive after :normal exit. Forcing with :kill.") # Supervisor ยังไม่หยุด, สั่ง kill
         Process.exit(pid, :kill)
       end
     else
-      Logger.warning("Task.Supervisor #{inspect(pid)} was not alive when attempting to stop.")
+      Logger.warning("Task.Supervisor #{inspect(pid)} was not alive when attempting to stop.") # Supervisor ไม่ได้ทำงานอยู่แล้ว
     end
   end
 
+  # ฟังก์ชันสำหรับดึงฟังก์ชันจำลองการทำงานของ consensus ที่ต้องการ
   defp get_simulation_function(consensus_type) do
     case consensus_type do
-      :poa -> &ChainBench.BlockchainSimulations.simulate_poa/3
-      :pbft -> &ChainBench.BlockchainSimulations.simulate_pbft/3
-      :pow -> &ChainBench.BlockchainSimulations.simulate_pow/3
-      :pos -> &ChainBench.BlockchainSimulations.simulate_pos/3
-      :dpos -> &ChainBench.BlockchainSimulations.simulate_dpos/3
-      :hybrid_poa -> &ChainBench.BlockchainSimulations.simulate_hybrid_poa/3
+      :poa -> &BlockchainSimulations.simulate_poa/3
+      :pbft -> &BlockchainSimulations.simulate_pbft/3
+      :pow -> &BlockchainSimulations.simulate_pow/3
+      :pos -> &BlockchainSimulations.simulate_pos/3
+      :dpos -> &BlockchainSimulations.simulate_dpos/3
+      :hybrid_poa -> &BlockchainSimulations.simulate_hybrid_poa/3
       _ ->
-        Logger.error("Unknown consensus type: #{consensus_type}")
-        fn _tx_count, _node_count, _supervisor_pid ->
-          Logger.error("Attempted to run benchmark for unknown consensus type: #{consensus_type}")
-          :error_unknown_consensus_type_in_benchmark_job
+        fn _, _, _ ->
+          Logger.error("Attempted to run unknown consensus type: #{consensus_type}") # ไม่รู้จักประเภท consensus นี้
+          :error_unknown_consensus
         end
     end
   end
 
-  defp generate_filename_part(opts) do
+  # ฟังก์ชันสำหรับสร้างส่วนหนึ่งของชื่อไฟล์ตามพารามิเตอร์ที่ใช้รัน
+  defp generate_filename_base(opts) do
     datetime_str =
       DateTime.utc_now()
       |> DateTime.to_string()
@@ -134,13 +151,123 @@ defmodule ChainBench.BenchmarkRunner do
       |> String.replace("T", "_")
       |> String.replace("Z", "")
 
-    # opts is a map here
-    tx_str = "tx_#{Map.get(opts, :transactions)}" # Use Map.get for safety, though fetch! was used above
-    nodes_val = Map.get(opts, :nodes, []) # Default to empty list if not found
+    tx_str = "tx_#{Map.get(opts, :transactions)}"
+    nodes_val = Map.get(opts, :nodes, [])
     nodes_str = "nodes_#{Enum.join(nodes_val, "-")}"
-    consensus_val = Map.get(opts, :consensus, []) # Default to empty list
-    consensus_str = "consensus_#{consensus_val |> Enum.map(&to_string/1) |> Enum.join("-")}"
+    consensus_val = Map.get(opts, :consensus, [])
+    consensus_str = "consensus_#{Enum.map(consensus_val, &to_string/1) |> Enum.join("-")}"
 
     "report_#{tx_str}_#{nodes_str}_#{consensus_str}_#{datetime_str}"
+  end
+
+  # --- สร้างไฟล์ JSON ในรูปแบบ Vega-Lite สำหรับ Consensus Benchmarks ---
+  defp generate_vega_lite_spec(suite_struct, output_file, tx_count_for_run) do
+    Logger.debug("Attempting to generate Vega-Lite spec. Output file: #{output_file}") # เริ่มสร้าง Vega-Lite spec
+
+    # ตรวจสอบว่า Benchee suite_struct มีข้อมูล scenarios ที่ถูกต้อง
+    if suite_struct && Map.has_key?(suite_struct, :scenarios) && is_list(suite_struct.scenarios) && !Enum.empty?(suite_struct.scenarios) do
+      Logger.info("Found #{Enum.count(suite_struct.scenarios)} scenarios in Benchee results. Processing for Vega-Lite.") # พบ scenarios, กำลังประมวลผล
+      try do
+        # แปลงข้อมูลจาก Benchee scenarios ให้อยู่ในรูปแบบที่ Vega-Lite ต้องการ
+        vega_data_list =
+          Enum.map(suite_struct.scenarios, fn scenario ->
+            parts = String.split(scenario.job_name, " / ", parts: 3) # แยกส่วนจากชื่อ job
+
+            consensus_type_str = List.first(parts) # เช่น "POA"
+            nodes_str = Enum.at(parts, 1)          # เช่น "1 nodes"
+
+            node_count =
+              if nodes_str do
+                case Regex.run(~r/^(\d+) nodes$/, nodes_str) do # ดึงจำนวนโหนด
+                  [_, count_str] -> String.to_integer(count_str)
+                  _ ->
+                    Logger.warning("Could not parse node count from: '#{nodes_str}' in job '#{scenario.job_name}'. Defaulting to 0.")
+                    0
+                end
+              else
+                Logger.warning("Could not extract nodes string from job_name: '#{scenario.job_name}'. Defaulting to 0.")
+                0
+              end
+
+            # ดึงค่า IPS (Iterations Per Second) อย่างปลอดภัย
+            ips =
+              scenario
+              |> Map.get(:run_time_data, %{})
+              |> Map.get(:statistics, %{})
+              |> Map.get(:ips, 0.0)
+
+            if ips == 0.0 do
+              Logger.warning("IPS is 0.0 for job: '#{scenario.job_name}'. Check Benchee statistics.") # IPS เป็น 0, ควรตรวจสอบ
+            end
+
+            # สร้าง map ข้อมูลสำหรับ Vega-Lite
+            %{
+              "Consensus" => consensus_type_str,
+              "Nodes" => node_count,
+              "IPS" => ips,
+              "Transactions" => tx_count_for_run # จำนวนธุรกรรมที่ใช้ในการรันนี้
+            }
+          end)
+
+        Logger.debug("Transformed data for Vega-Lite: #{inspect(vega_data_list, pretty: true, limit: :infinity)}") # ข้อมูลที่แปลงแล้ว
+
+        if Enum.empty?(vega_data_list) do
+          Logger.error("Vega data list is empty after processing scenarios. No Vega-Lite file will be generated.") # ไม่มีข้อมูลสำหรับ Vega-Lite
+        else
+          # สร้าง Vega-Lite specification ทั้งหมด
+          full_vega_spec_map = create_consensus_vega_spec_map(vega_data_list, tx_count_for_run)
+          # แปลงเป็น JSON string
+          json_vega_spec = Jason.encode!(full_vega_spec_map, pretty: true)
+          # เขียนลงไฟล์
+          File.write!(output_file, json_vega_spec)
+          Logger.info("Consensus Vega-Lite spec with embedded data saved to #{output_file}") # บันทึกไฟล์ Vega-Lite spec แล้ว
+        end
+      rescue
+        e -> Logger.error("ERROR during Consensus Vega-Lite spec creation: #{inspect(e)}\nStacktrace: #{inspect(__STACKTRACE__)}") # เกิดข้อผิดพลาด
+      catch
+        type, reason -> Logger.error("CATCH during Consensus Vega-Lite spec: #{type} - #{inspect(reason)}\nStacktrace: #{inspect(__STACKTRACE__)}") # เกิดข้อผิดพลาด (catch)
+      end
+    else
+      Logger.error("Could not generate Vega-Lite spec: Benchee results missing :scenarios, :scenarios is not a list, or scenarios list is empty.") # ข้อมูล scenarios ไม่ถูกต้อง
+    end
+  end
+
+  # ฟังก์ชันสำหรับสร้าง Vega-Lite specification map
+  defp create_consensus_vega_spec_map(data_list, tx_count) do
+    %{
+      "$schema" => "https://vega.github.io/schema/vega-lite/v5.json",
+      "title" => "Consensus Algorithm Performance (Transactions: #{tx_count})",
+      "description" => "Throughput (IPS) vs. Number of Nodes for various consensus algorithms.",
+      "data" => %{"values" => data_list}, # ข้อมูลที่แปลงแล้วจะถูกใส่ที่นี่
+      "mark" => %{"type" => "line", "point" => true}, # ประเภทของกราฟ (เส้นและจุด)
+      "encoding" => %{ # การ map ข้อมูลไปยังแกนและสี
+        "x" => %{
+          "field" => "Nodes", # แกน X คือจำนวนโหนด
+          "type" => "quantitative",
+          "title" => "Number of Nodes",
+          "axis" => %{"tickMinStep" => 1}, # ให้แสดง tick เป็นจำนวนเต็ม
+          "sort" => "ascending" # เรียงข้อมูลตามแกน X จากน้อยไปมาก
+        },
+        "y" => %{
+          "field" => "IPS", # แกน Y คือ IPS
+          "type" => "quantitative",
+          "title" => "Throughput (Iterations Per Second)",
+          "axis" => %{"format" => ",.0f"} # รูปแบบการแสดงผลแกน Y
+        },
+        "color" => %{
+          "field" => "Consensus", # สีของเส้นแทนประเภท Consensus
+          "type" => "nominal",
+          "title" => "Consensus Algorithm"
+        },
+        "tooltip" => [ # ข้อมูลที่จะแสดงเมื่อ hover บนจุด
+          %{"field" => "Consensus", "type" => "nominal", "title" => "Algorithm"},
+          %{"field" => "Nodes", "type" => "quantitative", "title" => "Nodes"},
+          %{"field" => "IPS", "type" => "quantitative", "title" => "IPS", "format" => ",.2f"},
+          %{"field" => "Transactions", "type" => "quantitative", "title" => "Txs per Run"}
+        ]
+      },
+      "width" => "container", # ให้ความกว้างของกราฟปรับตาม container
+      "height" => 400
+    }
   end
 end
