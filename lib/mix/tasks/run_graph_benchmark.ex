@@ -60,10 +60,7 @@ defmodule Mix.Tasks.RunGraphBenchmark do
 
   # ฟังก์ชันหลักที่ Mix จะเรียกเมื่อรัน task นี้
   def run(args) do
-    # ตรวจสอบให้แน่ใจว่าแอปพลิเคชัน (:chain_bench) ได้เริ่มทำงานแล้ว
     Application.ensure_all_started(:chain_bench)
-
-    # กำหนด switches สำหรับการ parse command-line arguments
     switches = [
       sizes: :string,
       dag_parents: :integer,
@@ -78,13 +75,8 @@ defmodule Mix.Tasks.RunGraphBenchmark do
       seed_graph: :integer,
       seed_query: :integer
     ]
-    # aliases ไม่ได้ใช้ใน task นี้เพื่อหลีกเลี่ยงการชนกับ task อื่น
-
-    # Parse command-line arguments
     case OptionParser.parse(args, switches: switches) do
-      # กรณี parse สำเร็จและไม่มี options ที่ไม่ถูกต้อง
       {parsed_opts, _remaining_args, []} ->
-        # ดึงค่า options ที่ parse ได้ หรือใช้ค่า default ถ้าไม่ได้ระบุ
         sizes_str = Keyword.get(parsed_opts, :sizes, @default_sizes_str)
         dag_parents = Keyword.get(parsed_opts, :dag_parents, @default_dag_parents)
         tx_per_block = Keyword.get(parsed_opts, :tx_per_block, @default_tx_per_block)
@@ -94,14 +86,13 @@ defmodule Mix.Tasks.RunGraphBenchmark do
         time_s = Keyword.get(parsed_opts, :time, @default_time)
         memory_s = Keyword.get(parsed_opts, :memory_time, @default_memory_time)
         output_dir_path = Keyword.get(parsed_opts, :output_dir, @default_output_dir)
-        output_basename = Keyword.get(parsed_opts, :output_basename) # อาจเป็น nil
-        seed_graph_opt = Keyword.get(parsed_opts, :seed_graph) # อาจเป็น nil
-        seed_query_opt = Keyword.get(parsed_opts, :seed_query) # อาจเป็น nil
+        output_basename = Keyword.get(parsed_opts, :output_basename)
+        seed_graph_opt = Keyword.get(parsed_opts, :seed_graph)
+        seed_query_opt = Keyword.get(parsed_opts, :seed_query)
 
-        # แปลง string ของ sizes ให้อยู่ในรูปแบบ list ของ integers
-        sizes_list = parse_sizes_string(sizes_str)
+        # Use shared helpers
+        sizes_list = ChainBench.BenchmarkCliHelpers.parse_positive_int_list(sizes_str)
 
-        # ตรวจสอบความถูกต้องของ options ที่แปลงแล้ว
         cond do
           sizes_list == :error_parsing or (Enum.empty?(sizes_list) and sizes_str != "") ->
             error_exit("Invalid format for --sizes. Use comma-separated positive numbers.")
@@ -109,9 +100,7 @@ defmodule Mix.Tasks.RunGraphBenchmark do
           tx_per_block <= 0 -> error_exit("--tx-per-block must be a positive integer.")
           k_internal < 0 -> error_exit("--k-internal must be a non-negative integer.")
           k_external <= 0 -> error_exit("--k-external must be a positive integer.")
-          # กรณี options ถูกต้องทั้งหมด
           true ->
-            # สร้าง map ของ options ที่จะส่งให้ GraphBenchmarkRunner
             run_opts = %{
               sizes: sizes_list,
               dag_avg_parents: dag_parents,
@@ -125,51 +114,23 @@ defmodule Mix.Tasks.RunGraphBenchmark do
               benchee_memory_time: memory_s,
               output_dir: output_dir_path,
               output_basename: output_basename,
-              random_seed_graph: seed_graph_opt, # ส่ง seed สำหรับการสร้างกราฟ
-              random_seed_query: seed_query_opt   # ส่ง seed สำหรับการเลือก query target
+              random_seed_graph: seed_graph_opt,
+              random_seed_query: seed_query_opt
             }
-
-            Logger.info("Starting Enhanced Graph Benchmark suite with options: #{inspect(run_opts)}") # แจ้ง log
-            Mix.shell().info("Benchee running for graph benchmarks... This may take some time.") # แจ้งผู้ใช้
-
-            # เรียก ChainBench.GraphBenchmarkRunner.run_suite เพื่อเริ่มการ benchmark
-            # และจัดการผลลัพธ์โดยตรง
+            Logger.info("Starting Enhanced Graph Benchmark suite with options: #{inspect(run_opts)}")
+            Mix.shell().info("Benchee running for graph benchmarks... This may take some time.")
             case ChainBench.GraphBenchmarkRunner.run_suite(run_opts) do
-              {:ok, report_paths} -> # กรณี benchmark สำเร็จ
+              {:ok, report_paths} ->
                 Mix.shell().info("Graph Benchmark suite completed.")
                 Mix.shell().info("Benchee HTML report: #{report_paths.html_report}")
                 Mix.shell().info("Vega-Lite JSON spec: #{report_paths.vega_spec}")
-
-              {:error, reason} -> # กรณี benchmark ล้มเหลว (error ที่คาดไว้)
+              {:error, reason} ->
                 Mix.shell().error("Graph Benchmark suite failed: #{inspect(reason)}")
-                exit({:shutdown, 1}) # ออกจากโปรแกรมพร้อม error code
-
-              other_unexpected_result -> # กรณีผลลัพธ์อื่นๆ ที่ไม่คาดคิด
-                Mix.shell().error("Graph Benchmark suite encountered an unexpected error: #{inspect(other_unexpected_result)}")
-                exit({:shutdown, 1}) # ออกจากโปรแกรมพร้อม error code
+                exit({:shutdown, 1})
             end
         end
-      # กรณีมี options ที่ไม่ถูกต้อง
       {_parsed_opts, _remaining_args, invalid_opts} ->
         error_exit("Invalid option(s) for graph benchmark: #{inspect(invalid_opts)}\nUse 'mix help #{__MODULE__}' for usage instructions.")
-    end
-  end
-
-  # ฟังก์ชันช่วยสำหรับ parse argument ของขนาดกราฟ (sizes)
-  defp parse_sizes_string(sizes_str) do
-    try do
-      sizes_str
-      |> String.split(",", trim: true)       # แยก string ด้วยจุลภาค และตัดช่องว่าง
-      |> Enum.reject(&(&1 == ""))            # ลบ string ว่าง
-      |> Enum.map(&String.to_integer/1)     # แปลงเป็น integer
-      |> Enum.filter(&(&1 > 0))             # กรองเอาเฉพาะค่าบวก
-      |> case do
-           # ถ้าผลลัพธ์เป็น list ว่าง แต่ input string ไม่ใช่ string ว่าง แสดงว่า parse ผิดพลาด
-           [] -> if String.trim(sizes_str) != "", do: :error_parsing, else: []
-           valid_list -> Enum.uniq(valid_list) |> Enum.sort() # ลบค่าซ้ำและเรียงลำดับ
-         end
-    rescue
-      ArgumentError -> :error_parsing # ดักจับ error ถ้าแปลงเป็น integer ไม่ได้
     end
   end
 

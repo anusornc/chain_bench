@@ -67,9 +67,9 @@ defmodule Mix.Tasks.RunBenchmark do # หรือ Mix.Tasks.Run_Benchmark ข�
         time_s = Keyword.get(parsed_opts, :time, @default_time)
         output_p = Keyword.get(parsed_opts, :output, @default_output_path)
 
-        # แปลง string ของ node counts และ consensus types ให้อยู่ในรูปแบบที่ต้องการ
-        node_counts_to_run = parse_node_argument(node_counts_str)
-        consensus_to_run = parse_consensus_argument(consensus_str)
+        # Use shared helpers
+        node_counts_to_run = ChainBench.BenchmarkCliHelpers.parse_positive_int_list(node_counts_str)
+        consensus_to_run = ChainBench.BenchmarkCliHelpers.parse_atom_list(consensus_str)
 
         # ตรวจสอบความถูกต้องของ options ที่แปลงแล้ว
         cond do
@@ -104,50 +104,11 @@ defmodule Mix.Tasks.RunBenchmark do # หรือ Mix.Tasks.Run_Benchmark ข�
               {:error, reason} -> # กรณี benchmark ล้มเหลว (error ที่คาดไว้)
                 Mix.shell().error("Consensus Benchmark suite failed: #{inspect(reason)}")
                 exit({:shutdown, 1}) # ออกจากโปรแกรมพร้อม error code
-
-              other_unexpected_result -> # กรณีผลลัพธ์อื่นๆ ที่ไม่คาดคิด
-                 Mix.shell().error("Consensus Benchmark suite encountered an unexpected error: #{inspect(other_unexpected_result)}")
-                exit({:shutdown, 1}) # ออกจากโปรแกรมพร้อม error code
             end
         end
       # กรณีมี options ที่ไม่ถูกต้อง
       {_parsed_opts, _remaining_args, invalid_opts} ->
         error_exit("Invalid option(s): #{inspect(invalid_opts)}\nUse 'mix help #{__MODULE__}' for usage instructions.")
-    end
-  end
-
-  # ฟังก์ชันช่วยสำหรับ parse argument ของจำนวนโหนด (nodes)
-  defp parse_node_argument(arg_string) do
-    try do
-      arg_string
-      |> String.split(",", trim: true)       # แยก string ด้วยจุลภาค และตัดช่องว่าง
-      |> Enum.reject(&(&1 == ""))            # ลบ string ว่างที่อาจเกิดขึ้น
-      |> Enum.map(&String.to_integer/1)     # แปลงแต่ละส่วนเป็น integer
-      |> Enum.filter(&(&1 > 0))             # กรองเอาเฉพาะค่าที่มากกว่า 0
-      |> case do
-           # ถ้าผลลัพธ์เป็น list ว่าง แต่ input string ไม่ใช่ string ว่าง แสดงว่า parse ผิดพลาด
-           [] -> if String.trim(arg_string) != "", do: :error_parsing, else: []
-           valid_list -> Enum.uniq(valid_list) |> Enum.sort() # ลบค่าซ้ำและเรียงลำดับ
-         end
-    rescue
-      ArgumentError -> :error_parsing # ดักจับ error ถ้าแปลงเป็น integer ไม่ได้
-    end
-  end
-
-  # ฟังก์ชันช่วยสำหรับ parse argument ของประเภท consensus
-  defp parse_consensus_argument(arg_string) do
-    try do
-      arg_string
-      |> String.split(",", trim: true)       # แยก string ด้วยจุลภาค และตัดช่องว่าง
-      |> Enum.reject(&(&1 == ""))            # ลบ string ว่าง
-      |> Enum.map(&String.to_atom/1)        # แปลงแต่ละส่วนเป็น atom
-      |> case do
-           # ถ้าผลลัพธ์เป็น list ว่าง แต่ input string ไม่ใช่ string ว่าง แสดงว่า parse ผิดพลาด
-           [] -> if String.trim(arg_string) != "", do: :error_parsing, else: []
-           valid_list -> Enum.uniq(valid_list) # ลบค่าซ้ำ
-         end
-    rescue
-      ArgumentError -> :error_parsing # ดักจับ error ถ้าแปลงเป็น atom ไม่ได้
     end
   end
 

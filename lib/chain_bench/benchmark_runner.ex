@@ -162,11 +162,11 @@ defmodule ChainBench.BenchmarkRunner do
 
   # --- สร้างไฟล์ JSON ในรูปแบบ Vega-Lite สำหรับ Consensus Benchmarks ---
   defp generate_vega_lite_spec(suite_struct, output_file, tx_count_for_run) do
-    Logger.debug("Attempting to generate Vega-Lite spec. Output file: #{output_file}") # เริ่มสร้าง Vega-Lite spec
+    Logger.debug("Attempting to generate Vega-Lite spec. Output file: #{output_file}")
 
     # ตรวจสอบว่า Benchee suite_struct มีข้อมูล scenarios ที่ถูกต้อง
-    if suite_struct && Map.has_key?(suite_struct, :scenarios) && is_list(suite_struct.scenarios) && !Enum.empty?(suite_struct.scenarios) do
-      Logger.info("Found #{Enum.count(suite_struct.scenarios)} scenarios in Benchee results. Processing for Vega-Lite.") # พบ scenarios, กำลังประมวลผล
+    if is_list(suite_struct.scenarios) and not Enum.empty?(suite_struct.scenarios) do
+      Logger.info("Found #{Enum.count(suite_struct.scenarios)} scenarios in Benchee results. Processing for Vega-Lite.")
       try do
         # แปลงข้อมูลจาก Benchee scenarios ให้อยู่ในรูปแบบที่ Vega-Lite ต้องการ
         vega_data_list =

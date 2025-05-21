@@ -150,7 +150,7 @@ defmodule ChainBench.GraphBenchmarkRunner do
       Logger.info("Benchmark finished. Benchee HTML report saved to #{benchee_html_output_file}") # Benchmark เสร็จสิ้น
 
       # --- การดึงข้อมูลและการสร้างไฟล์ Vega-Lite JSON ---
-      if suite_struct && Map.has_key?(suite_struct, :scenarios) && !Enum.empty?(suite_struct.scenarios) do
+      if is_list(suite_struct.scenarios) and not Enum.empty?(suite_struct.scenarios) do
         try do
           # แปลงผลลัพธ์จาก Benchee scenarios ให้อยู่ในรูปแบบ list ของ map สำหรับ Vega-Lite
           vega_data_list =
